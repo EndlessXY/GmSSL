@@ -22,48 +22,48 @@ extern "C" {
 #endif
 
 
-typedef uint64_t sm9_z256_t[4];
+typedef uint64_t sm9_z256_t[4]; // 长度为 4 的 uint64_t 数组。这种数组能够存储一个 256 位的大整数
 
-void sm9_z256_set_one(sm9_z256_t r);
-void sm9_z256_set_zero(sm9_z256_t r);
-void sm9_z256_copy(sm9_z256_t r, const sm9_z256_t a);
-void sm9_z256_copy_conditional(sm9_z256_t r, const sm9_z256_t a, uint64_t move);
-int  sm9_z256_cmp(const sm9_z256_t a, const sm9_z256_t b);
-uint64_t sm9_z256_is_zero(const sm9_z256_t a);
-uint64_t sm9_z256_equ(const sm9_z256_t a, const sm9_z256_t b);
-uint64_t sm9_z256_add(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b);
-uint64_t sm9_z256_sub(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b);
-void sm9_z256_mul(uint64_t r[8], const sm9_z256_t a, const sm9_z256_t b);
-void sm9_z256_from_bytes(sm9_z256_t r, const uint8_t in[32]);
-void sm9_z256_to_bytes(const sm9_z256_t a, uint8_t out[32]);
-int  sm9_z256_from_hex(sm9_z256_t r, const char *hex);
-void sm9_z256_to_hex(const sm9_z256_t r, char hex[64]);
-int  sm9_z256_equ_hex(const sm9_z256_t a, const char *hex);
-void sm9_z256_to_bits(const sm9_z256_t a, char bits[256]);
-int  sm9_z256_rand_range(sm9_z256_t r, const sm9_z256_t range);
-void sm9_z256_print_bn(const char *prefix, const sm9_z256_t a);
-int  sm9_z256_print(FILE *fp, int ind, int fmt, const char *label, const sm9_z256_t a);
+void sm9_z256_set_one(sm9_z256_t r);  // 将 r 设置为 1
+void sm9_z256_set_zero(sm9_z256_t r); // 将 r 设置为 0
+void sm9_z256_copy(sm9_z256_t r, const sm9_z256_t a);  // 将 a 复制到 r
+void sm9_z256_copy_conditional(sm9_z256_t r, const sm9_z256_t a, uint64_t move); // 当 move 为非 0 时，src 被复制到 dst；当 move 为 0 时，dst 保持不变。
+int  sm9_z256_cmp(const sm9_z256_t a, const sm9_z256_t b); // 比较 a 和 b 的大小，返回 1 表示 a > b，返回 0 表示 a = b，返回 -1 表示 a < b
+uint64_t sm9_z256_is_zero(const sm9_z256_t a); // 判断 a 是否为 0
+uint64_t sm9_z256_equ(const sm9_z256_t a, const sm9_z256_t b); // 判断 a 和 b 是否相等
+uint64_t sm9_z256_add(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b); // 计算 r = a + b
+uint64_t sm9_z256_sub(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b); // 计算 r = a - b
+void sm9_z256_mul(uint64_t r[8], const sm9_z256_t a, const sm9_z256_t b); // 计算 r = a * b
+void sm9_z256_from_bytes(sm9_z256_t r, const uint8_t in[32]); // 将长度为 32 的字节数组 in 转换为 r
+void sm9_z256_to_bytes(const sm9_z256_t a, uint8_t out[32]); // 将 r 转换为长度为 32 的字节数组 out
+int  sm9_z256_from_hex(sm9_z256_t r, const char *hex); // 将十六进制字符串 hex 转换为 r
+void sm9_z256_to_hex(const sm9_z256_t r, char hex[64]); // 将 r 转换为十六进制字符串 hex
+int  sm9_z256_equ_hex(const sm9_z256_t a, const char *hex); // 判断 a 和十六进制字符串 hex 是否相等
+void sm9_z256_to_bits(const sm9_z256_t a, char bits[256]); // 将 r 转换为二进制字符串 bits
+int  sm9_z256_rand_range(sm9_z256_t r, const sm9_z256_t range); // 生成一个随机数 r，满足 0 <= r < range
+void sm9_z256_print_bn(const char *prefix, const sm9_z256_t a); // 打印大整数 a
+int  sm9_z256_print(FILE *fp, int ind, int fmt, const char *label, const sm9_z256_t a); // 打印大整数 a
 
-const uint64_t *sm9_z256_prime(void);
+const uint64_t *sm9_z256_prime(void); // 返回一个 256 位素数
 
-void sm9_z256_modp_add(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b);
-void sm9_z256_modp_sub(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b);
-void sm9_z256_modp_dbl(sm9_z256_t r, const sm9_z256_t a);
-void sm9_z256_modp_tri(sm9_z256_t r, const sm9_z256_t a);
-void sm9_z256_modp_haf(sm9_z256_t r, const sm9_z256_t a);
-void sm9_z256_modp_neg(sm9_z256_t r, const sm9_z256_t a);
+void sm9_z256_modp_add(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b); // 计算 r = a + b mod p
+void sm9_z256_modp_sub(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b);  // 计算 r = a - b mod p
+void sm9_z256_modp_dbl(sm9_z256_t r, const sm9_z256_t a); // 计算 r = 2 * a mod p
+void sm9_z256_modp_tri(sm9_z256_t r, const sm9_z256_t a); // 计算 r = 3 * a mod p
+void sm9_z256_modp_haf(sm9_z256_t r, const sm9_z256_t a); // 计算 r = a / 2 mod p
+void sm9_z256_modp_neg(sm9_z256_t r, const sm9_z256_t a); // 计算 r = -a mod p
 
-void sm9_z256_modp_to_mont(sm9_z256_t r, const sm9_z256_t a);
-void sm9_z256_modp_from_mont(sm9_z256_t r, const sm9_z256_t a);
-void sm9_z256_modp_mont_mul(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b);
-void sm9_z256_modp_mont_sqr(sm9_z256_t r, const sm9_z256_t a);
-void sm9_z256_modp_mont_pow(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t e);
-void sm9_z256_modp_mont_inv(sm9_z256_t r, const sm9_z256_t a);
+void sm9_z256_modp_to_mont(sm9_z256_t r, const sm9_z256_t a); // 将 a 转换为蒙哥马利形式
+void sm9_z256_modp_from_mont(sm9_z256_t r, const sm9_z256_t a); // 将 a 转换为普通形式
+void sm9_z256_modp_mont_mul(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b); // 计算 r = a * b mod p
+void sm9_z256_modp_mont_sqr(sm9_z256_t r, const sm9_z256_t a); // 计算 r = a^2 mod p
+void sm9_z256_modp_mont_pow(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t e); // 计算 r = a^e mod p
+void sm9_z256_modp_mont_inv(sm9_z256_t r, const sm9_z256_t a); // 计算 r = a^(-1) mod p
 
-const uint64_t *sm9_z256_order(void);
+const uint64_t *sm9_z256_order(void); // 返回一个 256 位整数
 
-void sm9_z256_modn_add(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b);
-void sm9_z256_modn_sub(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b);
+void sm9_z256_modn_add(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b); // 计算 r = a + b mod n
+void sm9_z256_modn_sub(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b); // 计算 r = a - b mod n
 void sm9_z256_modn_mul(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b);
 void sm9_z256_modn_pow(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t e);
 void sm9_z256_modn_inv(sm9_z256_t r, const sm9_z256_t a);
