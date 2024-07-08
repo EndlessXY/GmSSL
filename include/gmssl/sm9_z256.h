@@ -64,16 +64,16 @@ const uint64_t *sm9_z256_order(void); // 返回一个 256 位整数
 
 void sm9_z256_modn_add(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b); // 计算 r = a + b mod n
 void sm9_z256_modn_sub(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b); // 计算 r = a - b mod n
-void sm9_z256_modn_mul(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b);
-void sm9_z256_modn_pow(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t e);
-void sm9_z256_modn_inv(sm9_z256_t r, const sm9_z256_t a);
-void sm9_z256_modn_from_hash(sm9_z256_t h, const uint8_t Ha[40]);
+void sm9_z256_modn_mul(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t b); // 计算 r = a * b mod n
+void sm9_z256_modn_pow(sm9_z256_t r, const sm9_z256_t a, const sm9_z256_t e); // 计算 r = a^e mod n
+void sm9_z256_modn_inv(sm9_z256_t r, const sm9_z256_t a); // 计算 r = a^(-1) mod n
+void sm9_z256_modn_from_hash(sm9_z256_t h, const uint8_t Ha[40]); // 将长度为 40 的字节数组 Ha 转换为 h
 
 
-typedef sm9_z256_t sm9_z256_fp2_t[2];
+typedef sm9_z256_t sm9_z256_fp2_t[2]; // 长度为 2 的 sm9_z256_t 数组
 
-void sm9_z256_fp2_set_one(sm9_z256_fp2_t r);
-void sm9_z256_fp2_set_zero(sm9_z256_fp2_t r);
+void sm9_z256_fp2_set_one(sm9_z256_fp2_t r); // 将 r 设置为 1
+void sm9_z256_fp2_set_zero(sm9_z256_fp2_t r); // 将 r 设置为 0
 int  sm9_z256_fp2_is_one(const sm9_z256_fp2_t a);
 int  sm9_z256_fp2_is_zero(const sm9_z256_fp2_t a);
 int  sm9_z256_fp2_equ(const sm9_z256_fp2_t a, const sm9_z256_fp2_t b);
@@ -101,7 +101,7 @@ void sm9_z256_fp2_conjugate(sm9_z256_fp2_t r, const sm9_z256_fp2_t a);
 void sm9_z256_fp2_frobenius(sm9_z256_fp2_t r, const sm9_z256_fp2_t a);
 
 
-typedef sm9_z256_fp2_t sm9_z256_fp4_t[2];
+typedef sm9_z256_fp2_t sm9_z256_fp4_t[2]; // 长度为 2 的 sm9_z256_fp2_t 数组
 
 int  sm9_z256_fp4_is_zero(const sm9_z256_fp4_t a);
 int  sm9_z256_fp4_equ(const sm9_z256_fp4_t a, const sm9_z256_fp4_t b);
@@ -130,7 +130,7 @@ void sm9_z256_fp4_frobenius2(sm9_z256_fp4_t r, const sm9_z256_fp4_t a);
 void sm9_z256_fp4_frobenius3(sm9_z256_fp4_t r, const sm9_z256_fp4_t a);
 
 
-typedef sm9_z256_fp4_t sm9_z256_fp12_t[3];
+typedef sm9_z256_fp4_t sm9_z256_fp12_t[3]; // 长度为 3 的 sm9_z256_fp4_t 数组
 
 void sm9_z256_fp12_set_one(sm9_z256_fp12_t r);
 void sm9_z256_fp12_set_zero(sm9_z256_fp12_t r);
@@ -165,7 +165,7 @@ typedef struct {
 	sm9_z256_t X; // is mont(X)
 	sm9_z256_t Y; // is mont(Y)
 	sm9_z256_t Z; // is mont(Z)
-} SM9_Z256_POINT;
+} SM9_Z256_POINT; // 一个椭圆曲线上的点
 
 const SM9_Z256_POINT *sm9_z256_generator(void);
 
@@ -189,7 +189,7 @@ int  sm9_z256_point_from_uncompressed_octets(SM9_Z256_POINT *P, const uint8_t oc
 typedef struct {
 	uint64_t X[4];
 	uint64_t Y[4];
-} SM9_Z256_AFFINE_POINT;
+} SM9_Z256_AFFINE_POINT; // 一个椭圆曲线上的点的仿射坐标
 
 void sm9_z256_point_copy_affine(SM9_Z256_POINT *R, const SM9_Z256_AFFINE_POINT *P);
 void sm9_z256_point_add_affine(SM9_Z256_POINT *R, const SM9_Z256_POINT *P, const SM9_Z256_AFFINE_POINT *Q);
