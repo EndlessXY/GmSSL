@@ -812,30 +812,30 @@ int sm9_z256_fp2_from_bytes(sm9_z256_fp2_t r, const uint8_t buf[64])
 
 int sm9_z256_fp2_from_hex(sm9_z256_fp2_t r, const char hex[64 * 2 + 1])
 {
-	if (sm9_z256_from_hex(r[1], hex) != 1) {
+	if (sm9_z256_from_hex(r[1], hex) != 1) { // 将16进制字符串的前64个字符转换为虚部 r[1]
 		error_print();
 		return -1;
 	}
-	if (sm9_z256_cmp(r[1], SM9_Z256_P) >= 0) {
+	if (sm9_z256_cmp(r[1], SM9_Z256_P) >= 0) { // 检查 r[1] 是否大于或等于有限域素数 SM9_Z256_P，如果是则返回错误。
 		error_print();
 		return -1;
 	}
-	sm9_z256_modp_to_mont(r[1], r[1]);
+	sm9_z256_modp_to_mont(r[1], r[1]); // 将虚部 r[1] 转换为蒙哥马利形式
 
-	if (hex[64] != SM9_Z256_HEX_SEP) {
+	if (hex[64] != SM9_Z256_HEX_SEP) { // 检查第65个字符（索引64）是否是预期的分隔符 SM9_Z256_HEX_SEP '\n'，如果不是则返回错误。
 		error_print();
 		return -1;
 	}
 
-	if (sm9_z256_from_hex(r[0], hex + 65) != 1) {
+	if (sm9_z256_from_hex(r[0], hex + 65) != 1) { // 将16进制字符串的后64个字符转换为实部 r[0]。
 		error_print();
 		return -1;
 	}
-	if (sm9_z256_cmp(r[0], SM9_Z256_P) >= 0) {
+	if (sm9_z256_cmp(r[0], SM9_Z256_P) >= 0) { // 检查 r[0] 是否大于或等于有限域素数 SM9_Z256_P，如果是则返回错误。
 		error_print();
 		return -1;
 	}
-	sm9_z256_modp_to_mont(r[0], r[0]);
+	sm9_z256_modp_to_mont(r[0], r[0]); // 将实部 r[0] 转换为蒙哥马利形式。
 
 	return 1;
 }
@@ -2109,7 +2109,7 @@ void sm9_z256_point_sub_affine(SM9_Z256_POINT *R, const SM9_Z256_POINT *P, const
 extern const uint64_t sm9_z256_pre_comp[37][64 * 4 * 2];
 static SM9_Z256_AFFINE_POINT (*g_pre_comp)[64] = (SM9_Z256_AFFINE_POINT (*)[64])sm9_z256_pre_comp;
 
-void sm9_z256_point_mul_generator(SM9_Z256_POINT *R, const sm9_z256_t k)  // R = k * G 使用Booth乘法
+void sm9_z256_point_mul_generator(SM9_Z256_POINT *R, const sm9_z256_t k)  // 计算椭圆曲线点乘法  R = k * G ，其中  G  是椭圆曲线的生成元。使用了 Booth 乘法算法。生成元G的预计算表 g_pre_comp
 {
 	size_t window_size = 7;
 	int R_infinity = 1;
@@ -2154,11 +2154,13 @@ int sm9_z256_twist_point_print(FILE *fp, int fmt, int ind, const char *label, co
 	return 1;
 }
 
-void sm9_z256_twist_point_from_hex(SM9_Z256_TWIST_POINT *R, const char hex[64 * 4 + 3])
+// R：指向SM9_Z256_TWIST_POINT结构体的指针，用于存储转换后的椭圆曲线点。
+// hex：表示椭圆曲线点的16进制字符串，长度为64 * 4 + 3。
+void sm9_z256_twist_point_from_hex(SM9_Z256_TWIST_POINT *R, const char hex[64 * 4 + 3]) // 用于将一个表示椭圆曲线点的16进制字符串转换为SM9_Z256_TWIST_POINT结构体。
 {
-	sm9_z256_fp2_from_hex(R->X, hex);
-	sm9_z256_fp2_from_hex(R->Y, hex + 65 * 2);
-	sm9_z256_fp2_set_one(R->Z);
+	sm9_z256_fp2_from_hex(R->X, hex); // 将16进制字符串的前128个字符（64个字节）转换为fp2格式，并存储在点R的X坐标中。
+	sm9_z256_fp2_from_hex(R->Y, hex + 65 * 2); // 将16进制字符串中从第131个字符开始的128个字符转换为fp2格式，并存储在点R的Y坐标中。
+	sm9_z256_fp2_set_one(R->Z); // 将点R的Z坐标设置为1，即初始化为椭圆曲线点的齐次坐标形式。
 }
 
 int sm9_z256_twist_point_is_at_infinity(const SM9_Z256_TWIST_POINT *P)
@@ -2168,7 +2170,7 @@ int sm9_z256_twist_point_is_at_infinity(const SM9_Z256_TWIST_POINT *P)
 
 void sm9_z256_twist_point_set_infinity(SM9_Z256_TWIST_POINT *R)
 {
-	sm9_z256_fp2_set_one(R->X);
+	sm9_z256_fp2_set_one(R->X); //
 	sm9_z256_fp2_set_one(R->Y);
 	sm9_z256_fp2_set_zero(R->Z);
 }

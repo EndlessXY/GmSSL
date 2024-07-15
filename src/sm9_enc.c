@@ -104,27 +104,42 @@ int sm9_kem_decrypt(const SM9_ENC_KEY *key, const char *id, size_t idlen, const 
 	return 1;
 }
 
+// mpk：指向 SM9 加密主公钥的指针。
+// id：表示用户身份的字符串。
+// idlen：用户身份字符串的长度。
+// in：要加密的明文数据。
+// inlen：明文数据的长度。
+// C1：用于存储加密过程中生成的点 C1。
+// c2：用于存储加密后的密文数据。
+// c3：用于存储 HMAC 校验值。
 int sm9_do_encrypt(const SM9_ENC_MASTER_KEY *mpk, const char *id, size_t idlen,
 	const uint8_t *in, size_t inlen,
 	SM9_Z256_POINT *C1, uint8_t *c2, uint8_t c3[SM3_HMAC_SIZE])
 {
-	SM3_HMAC_CTX hmac_ctx;
-	uint8_t K[SM9_MAX_PLAINTEXT_SIZE + 32];
+	SM3_HMAC_CTX hmac_ctx; // HMAC 上下文结构体，用于计算 HMAC 校验值。
+	uint8_t K[SM9_MAX_PLAINTEXT_SIZE + 32]; // 密钥缓冲区，用于存储 KEM（密钥封装机制）生成的密钥数据。
 
-	if (sm9_kem_encrypt(mpk, id, idlen, sizeof(K), K, C1) != 1) {
+	if (sm9_kem_encrypt(mpk, id, idlen, sizeof(K), K, C1) != 1) { // 调用 sm9_kem_encrypt 函数，执行密钥封装机制生成密钥 K 和点 C1。
 		error_print();
 		return -1;
 	}
-	gmssl_memxor(c2, K, in, inlen);
+	gmssl_memxor(c2, K, in, inlen); // 使用 K 中的前 inlen 个字节与明文 in 进行按位异或（XOR）操作，生成密文 c2。
 
 	//sm3_hmac(K + inlen, 32, c2, inlen, c3);
-	sm3_hmac_init(&hmac_ctx, K + inlen, SM3_HMAC_SIZE);
-	sm3_hmac_update(&hmac_ctx, c2, inlen);
-	sm3_hmac_finish(&hmac_ctx, c3);
-	gmssl_secure_clear(&hmac_ctx, sizeof(hmac_ctx));
+	sm3_hmac_init(&hmac_ctx, K + inlen, SM3_HMAC_SIZE); // 初始化 HMAC 上下文。
+	sm3_hmac_update(&hmac_ctx, c2, inlen); // 更新 HMAC 上下文，处理数据。
+	sm3_hmac_finish(&hmac_ctx, c3); // 完成 HMAC 计算，生成校验值。
+	gmssl_secure_clear(&hmac_ctx, sizeof(hmac_ctx)); // 安全清除 HMAC 上下文中的敏感数据。
 	return 1;
 }
-
+// key: SM9 解密密钥
+// id: 用户 ID
+// idlen: 用户 ID 的长度
+// C1: 密文的一部分，椭圆曲线上的一个点
+// c2: 密文的另一部分
+// c2len: 密文 c2 的长度
+// c3: 密文的 HMAC 校验码
+// out: 输出缓冲区，用于存放解密后的明文
 int sm9_do_decrypt(const SM9_ENC_KEY *key, const char *id, size_t idlen,
 	const SM9_Z256_POINT *C1, const uint8_t *c2, size_t c2len, const uint8_t c3[SM3_HMAC_SIZE],
 	uint8_t *out)
@@ -133,26 +148,27 @@ int sm9_do_decrypt(const SM9_ENC_KEY *key, const char *id, size_t idlen,
 	uint8_t k[SM9_MAX_PLAINTEXT_SIZE + SM3_HMAC_SIZE];
 	uint8_t mac[SM3_HMAC_SIZE];
 
-	if (c2len > SM9_MAX_PLAINTEXT_SIZE) {
+	if (c2len > SM9_MAX_PLAINTEXT_SIZE) { // 确保密文长度不超过允许的最大值。
 		error_print();
 		return -1;
 	}
 
-	if (sm9_kem_decrypt(key, id, idlen, C1, sizeof(k), k) != 1) {
+	if (sm9_kem_decrypt(key, id, idlen, C1, sizeof(k), k) != 1) { // 解密 KEM（密钥封装机制）生成的密钥 K。
 		error_print();
 		return -1;
 	}
 	//sm3_hmac(k + c2len, SM3_HMAC_SIZE, c2, c2len, mac);
+    // 使用 sm3_hmac 计算 c2 的 HMAC 校验码并存储在 mac 中。这里使用 k 的后半部分作为 HMAC 的密钥。
 	sm3_hmac_init(&hmac_ctx, k + c2len, SM3_HMAC_SIZE);
 	sm3_hmac_update(&hmac_ctx, c2, c2len);
 	sm3_hmac_finish(&hmac_ctx, mac);
 	gmssl_secure_clear(&hmac_ctx, sizeof(hmac_ctx));
 
-	if (gmssl_secure_memcmp(c3, mac, sizeof(mac)) != 0) {
+	if (gmssl_secure_memcmp(c3, mac, sizeof(mac)) != 0) { // 比较计算得到的 HMAC 和密文中的 HMAC 如果 HMAC 校验码不匹配，则返回错误。
 		error_print();
 		return -1;
 	}
-	gmssl_memxor(out, k, c2, c2len);
+	gmssl_memxor(out, k, c2, c2len); // 使用密钥 k 和密文 c2 进行异或操作，得到解密后的明文存储在 out 中。
 	return 1;
 }
 
@@ -184,12 +200,12 @@ int sm9_ciphertext_to_der(const SM9_Z256_POINT *C1, const uint8_t *c2, size_t c2
 	if (asn1_int_to_der(en_type, NULL, &len) != 1
 		|| asn1_bit_octets_to_der(c1, sizeof(c1), NULL, &len) != 1
 		|| asn1_octet_string_to_der(c3, SM3_HMAC_SIZE, NULL, &len) != 1
-		|| asn1_octet_string_to_der(c2, c2len, NULL, &len) != 1
+		|| asn1_octet_string_to_der(c2, c2len, NULL, &len) != 1 // 计算各个字段的 DER 编码长度并累加到 len 中。这里的 out 参数传递为 NULL，表示只是计算长度，而不进行实际编码。
 		|| asn1_sequence_header_to_der(len, out, outlen) != 1
 		|| asn1_int_to_der(en_type, out, outlen) != 1
 		|| asn1_bit_octets_to_der(c1, sizeof(c1), out, outlen) != 1
 		|| asn1_octet_string_to_der(c3, SM3_HMAC_SIZE, out, outlen) != 1
-		|| asn1_octet_string_to_der(c2, c2len, out, outlen) != 1) {
+		|| asn1_octet_string_to_der(c2, c2len, out, outlen) != 1) {  // 按照 DER 编码格式将各个字段编码到输出缓冲区 out 中，并更新 outlen 的值。
 		error_print();
 		return -1;
 	}
@@ -238,23 +254,32 @@ int sm9_ciphertext_from_der(SM9_Z256_POINT *C1, const uint8_t **c2, size_t *c2le
 	return 1;
 }
 
+// mpk：指向 SM9 加密主公钥的指针。
+// id：表示用户身份的字符串。
+// idlen：用户身份字符串的长度。
+// in：要加密的明文数据。
+// inlen：明文数据的长度。
+// out：用于存储加密后的输出数据。
+// outlen：存储加密后输出数据的长度。
 int sm9_encrypt(const SM9_ENC_MASTER_KEY *mpk, const char *id, size_t idlen,
 	const uint8_t *in, size_t inlen, uint8_t *out, size_t *outlen)
 {
+    // 定义了临时变量 C1、c2 和 c3，分别用于存储加密过程中生成的 C1 点、加密后的明文数据和 HMAC 校验值。
 	SM9_Z256_POINT C1;
 	uint8_t c2[SM9_MAX_PLAINTEXT_SIZE];
 	uint8_t c3[SM3_HMAC_SIZE];
 
-	if (inlen > SM9_MAX_PLAINTEXT_SIZE) {
+	if (inlen > SM9_MAX_PLAINTEXT_SIZE) { // 检查输入数据的长度是否超过了 SM9 规定的最大明文长度。如果超过，则返回错误。 255
 		error_print();
 		return -1;
 	}
 
-	if (sm9_do_encrypt(mpk, id, idlen, in, inlen, &C1, c2, c3) != 1) {
+	if (sm9_do_encrypt(mpk, id, idlen, in, inlen, &C1, c2, c3) != 1) { // 进行实际的加密操作。如果加密失败，打印错误信息并返回错误。
 		error_print();
 		return -1;
 	}
-	*outlen = 0;
+	*outlen = 0; // 初始化输出数据长度为 0
+    // 调用 sm9_ciphertext_to_der 函数，将加密后的数据（包括 C1、c2 和 c3）编码为 DER 格式，并存储在 out 中。
 	if (sm9_ciphertext_to_der(&C1, c2, inlen, c3, &out, outlen) != 1) { // FIXME: when out == NULL	
 		error_print();
 		return -1;
@@ -262,21 +287,28 @@ int sm9_encrypt(const SM9_ENC_MASTER_KEY *mpk, const char *id, size_t idlen,
 	return 1;
 }
 
+// key：指向用于解密的 SM9 密钥。
+// id：标识符。
+// idlen：标识符的长度。
+// in：输入的加密数据。
+// inlen：输入数据的长度。
+// out：解密后的输出缓冲区。
+// outlen：指向输出缓冲区长度的指针。
 int sm9_decrypt(const SM9_ENC_KEY *key, const char *id, size_t idlen,
 	const uint8_t *in, size_t inlen, uint8_t *out, size_t *outlen)
 {
-	SM9_Z256_POINT C1;
-	const uint8_t *c2;
-	size_t c2len;
-	const uint8_t *c3;
+	SM9_Z256_POINT C1; // 存储解密过程中使用的点 C1。
+	const uint8_t *c2; // 存储解密后得到的密文数据。
+	size_t c2len; // 密文数据的长度。
+	const uint8_t *c3; // 存储解密后得到的 HMAC 校验值。
 
-	if (sm9_ciphertext_from_der(&C1, &c2, &c2len, &c3, &in, &inlen) != 1
-		|| asn1_length_is_zero(inlen) != 1) {
+	if (sm9_ciphertext_from_der(&C1, &c2, &c2len, &c3, &in, &inlen) != 1 // 从 DER 编码的输入数据中提取点 C1、密文数据 c2、密文数据长度 c2len 和 HMAC 校验值 c3。
+		|| asn1_length_is_zero(inlen) != 1) { // 检查剩余的输入数据长度是否为零。
 		error_print();
 		return -1;
 	}
-	*outlen = c2len;
-	if (!out) {
+	*outlen = c2len; // 将密文数据的长度赋值给 outlen。
+	if (!out) { // 如果 out 为 NULL，只返回长度信息。只需要知道解密后的数据长度
 		return 1;
 	}
 	if (sm9_do_decrypt(key, id, idlen, &C1, c2, c2len, c3, out) != 1) {

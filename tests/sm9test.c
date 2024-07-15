@@ -748,27 +748,28 @@ err:
 
 int test_sm9_z256_encrypt()  // 测试SM9算法的加密和解密操作。
 {
-	SM9_ENC_MASTER_KEY msk;
-	SM9_ENC_KEY key;
-	SM9_Z256_TWIST_POINT de;
-	uint8_t out[1000] = {0};
-	size_t outlen = 0;
-	int j = 1;
+	SM9_ENC_MASTER_KEY msk;  // 加密主密钥
+	SM9_ENC_KEY key; // 用户加密密钥
+	SM9_Z256_TWIST_POINT de; // 用于比较的预期结果
+	uint8_t out[1000] = {0};  // 用于存储加密后的数据
+	size_t outlen = 0;  // 存储加密数据的长度
+	int j = 1; // 用于记录测试步骤的变量
 
+    // 原始数据
 	uint8_t data[20] = {0x43, 0x68, 0x69, 0x6E, 0x65, 0x73, 0x65, 0x20, 0x49, 0x42, 0x53, 0x20, 0x73, 0x74, 0x61, 0x6E, 0x64, 0x61, 0x72, 0x64};
-	uint8_t dec[20] = {0};
-	size_t declen = 20;
-	uint8_t IDB[3] = {0x42, 0x6F, 0x62};
+	uint8_t dec[20] = {0}; // 用于存储解密后的数据
+	size_t declen = 20; // 解密数据的长度
+	uint8_t IDB[3] = {0x42, 0x6F, 0x62}; // 用户ID
 
-	sm9_z256_from_hex(msk.ke, hex_ke);
-	sm9_z256_point_mul_generator(&(msk.Ppube), msk.ke);
+	sm9_z256_from_hex(msk.ke, hex_ke);  // 初始化加密主私钥，这里使用固定值。"0001EDEE3778F441F8DEA3D9FA0ACC4E07EE36C93F9A08618AF4AD85CEDE1C22"
+	sm9_z256_point_mul_generator(&(msk.Ppube), msk.ke); // 计算加密主公钥
 
-	if (sm9_enc_master_key_extract_key(&msk, (char *)IDB, sizeof(IDB), &key) < 0) goto err; ++j;
-	sm9_z256_twist_point_from_hex(&de, hex_de); if (!sm9_z256_twist_point_equ(&(key.de), &de)) goto err; ++j;
+	if (sm9_enc_master_key_extract_key(&msk, (char *)IDB, sizeof(IDB), &key) < 0) goto err; ++j; // 从加密主密钥中提取用户加密密钥
+	sm9_z256_twist_point_from_hex(&de, hex_de); if (!sm9_z256_twist_point_equ(&(key.de), &de)) goto err; ++j;  // 将预期的用户加密密钥从16进制字符串转化为数值，并与提取的用户加密密钥进行比较
 
-	if (sm9_encrypt(&msk, (char *)IDB, sizeof(IDB), data, sizeof(data), out, &outlen) < 0) goto err; ++j;
-	if (sm9_decrypt(&key, (char *)IDB, sizeof(IDB), out, outlen, dec, &declen) < 0) goto err; ++j;
-	if (memcmp(data, dec, sizeof(data)) != 0) goto err; ++j;
+	if (sm9_encrypt(&msk, (char *)IDB, sizeof(IDB), data, sizeof(data), out, &outlen) < 0) goto err; ++j; // 使用加密主密钥对数据进行加密，输出的密文为DER格式
+	if (sm9_decrypt(&key, (char *)IDB, sizeof(IDB), out, outlen, dec, &declen) < 0) goto err; ++j; // 使用用户加密密钥对加密数据进行解密
+	if (memcmp(data, dec, sizeof(data)) != 0) goto err; ++j; // 检查解密后的数据是否与原始数据一致
 
 	printf("%s() ok\n", __FUNCTION__);
 	return 1;
