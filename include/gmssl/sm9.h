@@ -73,7 +73,7 @@ typedef struct {
 typedef struct {
 	SM9_Z256_TWIST_POINT Ppubs;
 	SM9_Z256_POINT ds;
-} SM9_SIGN_KEY; // SM9签名密钥
+} SM9_SIGN_KEY; // SM9用户签名密钥
 
 int sm9_sign_master_key_generate(SM9_SIGN_MASTER_KEY *master);  // 生成SM9签名主密钥
 int sm9_sign_master_key_extract_key(SM9_SIGN_MASTER_KEY *master, const char *id, size_t idlen, SM9_SIGN_KEY *key);  // 从SM9签名主密钥中提取密钥
@@ -159,10 +159,10 @@ typedef struct {
 typedef struct {
 	SM9_Z256_POINT Ppube;
 	SM9_Z256_TWIST_POINT de;
-} SM9_ENC_KEY; // SM9加密密钥
+} SM9_ENC_KEY; // SM9用户加密密钥
 
 int sm9_enc_master_key_generate(SM9_ENC_MASTER_KEY *master); // 生成SM9加密主密钥
-int sm9_enc_master_key_extract_key(SM9_ENC_MASTER_KEY *master, const char *id, size_t idlen, SM9_ENC_KEY *key); // 从SM9加密主密钥中提取密钥
+int sm9_enc_master_key_extract_key(SM9_ENC_MASTER_KEY *master, const char *id, size_t idlen, SM9_ENC_KEY *key); // 从加密主密钥 msk 中提取用户的密钥 key
 
 // algorithm,parameters = sm9,sm9encrypt
 #define SM9_ENC_MASTER_KEY_MAX_SIZE 105

@@ -206,19 +206,19 @@ int sm9_enc_master_key_to_der(const SM9_ENC_MASTER_KEY *msk, uint8_t **out, size
 	uint8_t Ppube[1 + 32 * 2];
 	size_t len = 0;
 
-	sm9_z256_to_bytes(msk->ke, ke);
-	sm9_z256_point_to_uncompressed_octets(&msk->Ppube, Ppube);
+	sm9_z256_to_bytes(msk->ke, ke);  // 将 ke 转换为字节数组
+	sm9_z256_point_to_uncompressed_octets(&msk->Ppube, Ppube); // 将 Ppube，椭圆曲线上的点 转换为未压缩的八位字节格式
 
-	if (asn1_integer_to_der(ke, sizeof(ke), NULL, &len) != 1
-		|| asn1_bit_octets_to_der(Ppube, sizeof(Ppube), NULL, &len) != 1
-		|| asn1_sequence_header_to_der(len, out, outlen) != 1
-		|| asn1_integer_to_der(ke, sizeof(ke), out, outlen) != 1
-		|| asn1_bit_octets_to_der(Ppube, sizeof(Ppube), out, outlen) != 1) {
+	if (asn1_integer_to_der(ke, sizeof(ke), NULL, &len) != 1 // 这个函数的作用是将整数 ke 编码为 DER 格式，并计算所需的长度 len
+		|| asn1_bit_octets_to_der(Ppube, sizeof(Ppube), NULL, &len) != 1 // 这个函数的作用是将比特字符串 Ppube 编码为 DER 格式，并计算所需的长度 len。
+		|| asn1_sequence_header_to_der(len, out, outlen) != 1 // 这个函数的作用是将之前计算出的总长度 len 作为序列的长度，并将序列头编码为 DER 格式。新输出缓冲区指针 out 和输出总长度 outlen。
+		|| asn1_integer_to_der(ke, sizeof(ke), out, outlen) != 1 // 这个函数的作用是将整数 ke 编码为 DER 格式，并将编码后的数据写入输出缓冲区 out。更新输出缓冲区指针 out 和输出总长度 outlen。
+		|| asn1_bit_octets_to_der(Ppube, sizeof(Ppube), out, outlen) != 1) { // 这个函数的作用是将比特字符串 Ppube 编码为 DER 格式，并将编码后的数据写入输出缓冲区 out。同样，它会更新输出缓冲区指针 out 和输出总长度 outlen。
 		gmssl_secure_clear(ke, sizeof(ke));
 		error_print();
 		return -1;
 	}
-	gmssl_secure_clear(ke, sizeof(ke));
+	gmssl_secure_clear(ke, sizeof(ke)); // 清除内存中的数据，以防止敏感信息泄漏。
 	return 1;
 }
 
@@ -411,20 +411,20 @@ int sm9_enc_master_key_extract_key(SM9_ENC_MASTER_KEY *msk, const char *id, size
 	sm9_z256_t t;
 
 	// t1 = H1(ID || hid, N) + ke
-	sm9_z256_hash1(t, id, idlen, SM9_HID_ENC);
-	sm9_z256_modn_add(t, t, msk->ke);
+	sm9_z256_hash1(t, id, idlen, SM9_HID_ENC);  // 将用户的标识符 id 和 hid（此处为 SM9_HID_ENC）进行哈希运算，得到哈希值 t。
+	sm9_z256_modn_add(t, t, msk->ke); // 将哈希值 t 和主密钥中的私钥部分 msk->ke 相加，得到 t1。
 	if (sm9_z256_is_zero(t)) {
 		error_print();
 		return -1;
 	}
 
 	// t2 = ke * t1^-1
-	sm9_z256_modn_inv(t, t);
-	sm9_z256_modn_mul(t, t, msk->ke);
+	sm9_z256_modn_inv(t, t); // 计算 t1 的模逆，得到 t1^-1。
+	sm9_z256_modn_mul(t, t, msk->ke); // 将 t1^-1 与 msk->ke 相乘，得到 t2。
 
 	// de = t2 * P2
-	sm9_z256_twist_point_mul_generator(&key->de, t);
-	key->Ppube = msk->Ppube;
+	sm9_z256_twist_point_mul_generator(&key->de, t);  // 将 t2 乘以生成元 P2，得到用户的私钥 key->de。
+	key->Ppube = msk->Ppube;  // 将主公钥 msk->Ppube 复制到用户公钥 key->Ppube。
 
 	return 1;
 }

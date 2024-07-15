@@ -93,18 +93,18 @@ static unsigned char *OPENSSL_hexstr2buf(const char *str, size_t *len)
 }
 
 
-static int hexchar2int(char c)
+static int hexchar2int(char c) // 将一个16进制字符转换为其对应的整数值
 {
-	if      ('0' <= c && c <= '9') return c - '0';
-	else if ('a' <= c && c <= 'f') return c - 'a' + 10;
-	else if ('A' <= c && c <= 'F') return c - 'A' + 10;
+	if      ('0' <= c && c <= '9') return c - '0'; // 检查字符是否为数字
+	else if ('a' <= c && c <= 'f') return c - 'a' + 10; // 检查字符是否为小写字母 a-f
+	else if ('A' <= c && c <= 'F') return c - 'A' + 10; // 检查字符是否为大写字母 A-F
 	else return -1;
 }
 
 int hex2bin(const char *in, size_t inlen, uint8_t *out)
 {
 	int c;
-	if (inlen % 2) {
+	if (inlen % 2) {  // 检查输入长度是否为偶数
 		error_print_msg("hex %s len = %zu\n", in, inlen);
 		return -1;
 	}
@@ -114,22 +114,22 @@ int hex2bin(const char *in, size_t inlen, uint8_t *out)
 			error_print();
 			return -1;
 		}
-		*out = (uint8_t)c << 4;
+		*out = (uint8_t)c << 4; // 处理第一个16进制字符并将其左移4位，这相当于该字符在字节中的高4位。
 		if ((c = hexchar2int(*in++)) < 0) {
 			error_print();
 			return -1;
 		}
-		*out |= (uint8_t)c;
-		inlen -= 2;
-		out++;
+		*out |= (uint8_t)c; // 处理第二个16进制字符，并将其与前面的结果进行按位或操作，这相当于将该字符放在字节的低4位。
+		inlen -= 2; // 每次处理两个字符，所以输入长度减少2。
+		out++; // 移动到下一个输出字节的位置。
 	}
 	return 1;
 }
 
 int hex_to_bytes(const char *in, size_t inlen, uint8_t *out, size_t *outlen)
 {
-	*outlen = inlen/2;
-	return hex2bin(in, inlen, out);
+	*outlen = inlen/2; // 每两个16进制字符表示一个字节
+	return hex2bin(in, inlen, out); // 调用转换函数
 }
 
 
@@ -200,7 +200,7 @@ static volatile memset_t memset_func = memset;
 
 void gmssl_secure_clear(void *ptr, size_t len)
 {
-	memset_func(ptr, 0, len);
+	memset_func(ptr, 0, len); // 将指定的内存区域设置为零
 }
 
 int mem_is_zero(const uint8_t *buf, size_t len)

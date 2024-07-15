@@ -24,11 +24,11 @@
 #define SM9_Z256_HEX_SEP '\n'
 
 
-const sm9_z256_t SM9_Z256_ONE = {1,0,0,0};
+const sm9_z256_t SM9_Z256_ONE = {1,0,0,0};  // 值为1的常量。用于一些初始化操作。
 
 
 // p =  b640000002a3a6f1d603ab4ff58ec74521f2934b1a7aeedbe56f9b27e351457d
-const sm9_z256_t SM9_Z256_P = {
+const sm9_z256_t SM9_Z256_P = {  // 椭圆曲线的素数模数  p 。这是定义曲线的有限域的素数。基域特征 q
 	0xe56f9b27e351457d, 0x21f2934b1a7aeedb, 0xd603ab4ff58ec745, 0xb640000002a3a6f1
 };
 
@@ -37,14 +37,14 @@ const uint64_t *sm9_256_prime(void) {
 }
 
 // p - 2 = b640000002a3a6f1d603ab4ff58ec74521f2934b1a7aeedbe56f9b27e351457b, used in a^(p-2) = a^-1
-const sm9_z256_t SM9_Z256_P_MINUS_TWO = {
+const sm9_z256_t SM9_Z256_P_MINUS_TWO = {  //  p - 2 。用于求逆运算。
 	0xe56f9b27e351457b, 0x21f2934b1a7aeedb, 0xd603ab4ff58ec745, 0xb640000002a3a6f1
 };
 
 // n =  b640000002a3a6f1d603ab4ff58ec74449f2934b18ea8beee56ee19cd69ecf25
-const sm9_z256_t SM9_Z256_N = {
+const sm9_z256_t SM9_Z256_N = {  // 曲线的阶数  n 。这是生成元点的周期，也就是所有点的个数。 群的阶 N
 	0xe56ee19cd69ecf25, 0x49f2934b18ea8bee, 0xd603ab4ff58ec744, 0xb640000002a3a6f1
-};
+};  // 这个数是用于椭圆曲线密码学中作为曲线参数的阶数（order），用来确保生成的密钥在一个有限域内
 
 const uint64_t *sm9_z256_order(void) {
 	return &SM9_Z256_N[0];
@@ -68,7 +68,7 @@ const sm9_z256_t SM9_Z256_NEG_N = {
 
 // P1.X 0x93DE051D62BF718FF5ED0704487D01D6E1E4086909DC3280E8C4E4817C66DDDD
 // P1.Y 0x21FE8DDA4F21E607631065125C395BBC1C1C00CBFA6024350C464CD70A3EA616
-const SM9_Z256_POINT _SM9_Z256_P1 = {
+const SM9_Z256_POINT _SM9_Z256_P1 = {  // 群G1 的生成元 P1
 	{0xe8c4e4817c66dddd, 0xe1e4086909dc3280, 0xf5ed0704487d01d6, 0x93de051d62bf718f},
 	{0x0c464cd70a3ea616, 0x1c1c00cbfa602435, 0x631065125c395bbc, 0x21fe8dda4f21e607},
 	{1,0,0,0}
@@ -83,7 +83,7 @@ const SM9_Z256_POINT *SM9_Z256_P1 = &_SM9_Z256_P1;
 	     0x17509b092e845c1266ba0d262cbee6ed0736a96fa347c8bd856dc76b84ebeb96n],
 	Z : [1n, 0n],
 */
-const SM9_Z256_TWIST_POINT _SM9_Z256_P2 = {
+const SM9_Z256_TWIST_POINT _SM9_Z256_P2 = { // 群G2 的生成元 P2
 	{{0xF9B7213BAF82D65B, 0xEE265948D19C17AB, 0xD2AAB97FD34EC120, 0x3722755292130B08},
 	 {0x54806C11D8806141, 0xF1DD2C190F5E93C4, 0x597B6027B441A01F, 0x85AEF3D078640C98}},
 	{{0x6215BBA5C999A7C7, 0x47EFBA98A71A0811, 0x5F3170153D278FF2, 0xA7CF28D519BE3DA6},
@@ -92,7 +92,7 @@ const SM9_Z256_TWIST_POINT _SM9_Z256_P2 = {
 };
 const SM9_Z256_TWIST_POINT *SM9_Z256_P2 = &_SM9_Z256_P2;
 
-
+// 签名主公钥
 const SM9_Z256_TWIST_POINT _SM9_Z256_Ppubs = {
 	{{0x8F14D65696EA5E32, 0x414D2177386A92DD, 0x6CE843ED24A3B573, 0x29DBA116152D1F78},
 	 {0x0AB1B6791B94C408, 0x1CE0711C5E392CFB, 0xE48AFF4B41B56501, 0x9F64080B3084F733}},
@@ -108,7 +108,7 @@ const SM9_Z256_TWIST_POINT *SM9_Z256_Ppubs = &_SM9_Z256_Ppubs;
 // 2^512 mod p = 0x2ea795a656f62fbde479b522d6706e7b88f8105fae1a5d3f27dea312b417e2d2
 // mont(1) mod p = 2^256 mod p = 0x49bffffffd5c590e29fc54b00a7138bade0d6cb4e58511241a9064d81caeba83
 //const uint64_t SM9_Z256_MODP_MU = 0x76d43bd3d0d11bd5;
-const sm9_z256_t SM9_Z256_MODP_2e512 = {0x27dea312b417e2d2, 0x88f8105fae1a5d3f, 0xe479b522d6706e7b, 0x2ea795a656f62fbd};
+const sm9_z256_t SM9_Z256_MODP_2e512 = {0x27dea312b417e2d2, 0x88f8105fae1a5d3f, 0xe479b522d6706e7b, 0x2ea795a656f62fbd}; // 用于蒙哥马利域中的运算。
 #define SM9_Z256_NEG_P SM9_Z256_MODP_MONT_ONE
 const sm9_z256_t SM9_Z256_MODP_MONT_ONE = {0x1a9064d81caeba83, 0xde0d6cb4e5851124, 0x29fc54b00a7138ba, 0x49bffffffd5c590e};
 const sm9_z256_t SM9_Z256_MODP_MONT_FIVE = {0xb9f2c1e8c8c71995, 0x125df8f246a377fc, 0x25e650d049188d1c, 0x43fffffed866f63};
@@ -169,10 +169,10 @@ int sm9_z256_rand_range(sm9_z256_t r, const sm9_z256_t range)
 
 void sm9_z256_from_bytes(sm9_z256_t r, const uint8_t in[32])
 {
-	r[3] = GETU64(in);
-	r[2] = GETU64(in + 8);
-	r[1] = GETU64(in + 16);
-	r[0] = GETU64(in + 24);
+	r[3] = GETU64(in);  // 将 in 数组的前 8 个字节（in[0] 到 in[7]）转换为一个 64 位无符号整数，并存储到 r[3] 中
+	r[2] = GETU64(in + 8); // 将 in 数组从第 8 个字节到第 15 个字节（in[8] 到 in[15]）转换为一个 64 位无符号整数，并存储到 r[2] 中
+	r[1] = GETU64(in + 16); // 将 in 数组从第 16 个字节到第 23 个字节（in[16] 到 in[23]）转换为一个 64 位无符号整数，并存储到 r[1] 中。
+	r[0] = GETU64(in + 24); // 将 in 数组从第 24 个字节到第 31 个字节（in[24] 到 in[31]）转换为一个 64 位无符号整数，并存储到 r[0] 中。
 }
 
 void sm9_z256_to_bytes(const sm9_z256_t a, uint8_t out[32])
@@ -364,20 +364,20 @@ int sm9_z256_get_booth(const uint64_t a[4], uint64_t window_size, int i)
 	return (int)(wbits & mask) - (int)((wbits >> 1) & mask);
 }
 
-int sm9_z256_from_hex(sm9_z256_t r, const char *hex)
+int sm9_z256_from_hex(sm9_z256_t r, const char *hex)  // 这段代码的功能是将一个表示大整数的16进制字符串转换为SM9中的256位大整数格式（sm9_z256_t）。
 {
 	uint8_t buf[32];
 	size_t len;
 
-	if (strlen(hex) < 64) {
+	if (strlen(hex) < 64) { // 检查16进制字符串的长度是否小于64
 		error_print();
 		return -1;
 	}
-	if (hex_to_bytes(hex, 64, buf, &len) != 1) {
+	if (hex_to_bytes(hex, 64, buf, &len) != 1) { // 将16进制字符串转换为字节数组：
 		error_print();
 		return -1;
 	}
-	sm9_z256_from_bytes(r, buf);
+	sm9_z256_from_bytes(r, buf); // 将字节数组转换为sm9_z256_t格式的大整数。
 	return 1;
 }
 
@@ -1808,26 +1808,28 @@ void sm9_z256_point_set_infinity(SM9_Z256_POINT *R)
 	sm9_z256_set_zero(R->Z);
 }
 
+// 这段代码的功能是从 SM9_Z256_POINT 结构体中提取出点 P 的 x 和 y 坐标，并将结果存储在 sm9_z256_t 类型的 x 和 y 中。
+// 该点的 x 和 y 坐标是通过逆变换和蒙哥马利乘法从椭圆曲线上的齐次坐标转换而来的。
 void sm9_z256_point_get_xy(const SM9_Z256_POINT *P, sm9_z256_t x, sm9_z256_t y)
 {
 	sm9_z256_t z_inv;
 
-	assert(!sm9_z256_is_zero(P->Z));
+	assert(!sm9_z256_is_zero(P->Z)); // 断言 P->Z 不为零
 
-	if (sm9_z256_equ(P->Z, SM9_Z256_MODP_MONT_ONE)) {
+	if (sm9_z256_equ(P->Z, SM9_Z256_MODP_MONT_ONE)) { // 如果 P->Z 等于蒙哥马利域中的单位元
 		sm9_z256_modp_from_mont(x, P->X);
 		sm9_z256_modp_from_mont(y, P->Y);
 		return;
 	}
 
-	sm9_z256_modp_mont_inv(z_inv, P->Z);
-	if (y) {
+	sm9_z256_modp_mont_inv(z_inv, P->Z); // 计算 Z 的逆
+	if (y) { // 如果 y 不为 NULL，则计算 Y / Z
 		sm9_z256_modp_mont_mul(y, P->Y, z_inv);
 	}
-	sm9_z256_modp_mont_sqr(z_inv, z_inv);
-	sm9_z256_modp_mont_mul(x, P->X, z_inv);
+	sm9_z256_modp_mont_sqr(z_inv, z_inv); // 计算 Z 的平方的逆
+	sm9_z256_modp_mont_mul(x, P->X, z_inv); // 计算 X / Z^2
 	sm9_z256_modp_from_mont(x, x);
-	if (y) {
+	if (y) { // 如果 y 不为 NULL，则计算 (Y / Z) / Z = Y / Z^2
 		sm9_z256_modp_mont_mul(y, y, z_inv);
 		sm9_z256_modp_from_mont(y, y);
 	}
@@ -2107,7 +2109,7 @@ void sm9_z256_point_sub_affine(SM9_Z256_POINT *R, const SM9_Z256_POINT *P, const
 extern const uint64_t sm9_z256_pre_comp[37][64 * 4 * 2];
 static SM9_Z256_AFFINE_POINT (*g_pre_comp)[64] = (SM9_Z256_AFFINE_POINT (*)[64])sm9_z256_pre_comp;
 
-void sm9_z256_point_mul_generator(SM9_Z256_POINT *R, const sm9_z256_t k)
+void sm9_z256_point_mul_generator(SM9_Z256_POINT *R, const sm9_z256_t k)  // R = k * G 使用Booth乘法
 {
 	size_t window_size = 7;
 	int R_infinity = 1;
@@ -3126,7 +3128,7 @@ int sm9_z256_point_to_uncompressed_octets(const SM9_Z256_POINT *P, uint8_t octet
 	sm9_z256_t x;
 	sm9_z256_t y;
 
-	sm9_z256_point_get_xy(P, x, y);
+	sm9_z256_point_get_xy(P, x, y); // 提取点的坐标
 
 	octets[0] = 0x04;
 	sm9_z256_to_bytes(x, octets + 1);

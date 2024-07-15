@@ -30,7 +30,7 @@
 #define hex_fp_pow 	"5679a8f0a46ada5b9d48008cde0b8b7a233f882c08afe8f08a36a20ac845bb1a"
 #define hex_fp_inv 	"7d404b0027a93e3fa8f8bc7ee367a96814c42a3b69feb1845093406948a34753"
 
-int test_sm9_z256_fp() {
+int test_sm9_z256_fp() {  // 测试有限域上的各种基本运算，包括加法、减法、倍加、乘法、求逆等操作。
 	const SM9_Z256_TWIST_POINT _P2 = {
 		{{0xF9B7213BAF82D65B, 0xEE265948D19C17AB, 0xD2AAB97FD34EC120, 0x3722755292130B08},
 		 {0x54806C11D8806141, 0xF1DD2C190F5E93C4, 0x597B6027B441A01F, 0x85AEF3D078640C98}},
@@ -91,7 +91,7 @@ err:
 #define hex_fn_pow 	"445cb9b76f27e9d03a2c30fbabb59b0ea6d7b06259b0c8a1b30f21b9b274a055"
 #define hex_fn_inv 	"3e3e849c2144c3596d9c79cb1f8ee7c60828787e298b06cc341a9a165191bc5e"
 
-int test_sm9_z256_fn() {
+int test_sm9_z256_fn() { // 测试有限域上的模数运算。
 	sm9_z256_t x;
 	sm9_z256_t y;
 	sm9_z256_t r;
@@ -131,7 +131,7 @@ err:
 #define hex_fp2_div	"ad68ff7c507f2d4e1cc6cd973c6b821906b9f5937a04fdedc84af1f75f97d00b\n8a84a35da11d401c8dca50a572ce7a8c99e7117c45d251f57a2418613dab16bb"
 #define hex_fp2_haf	"0ba84d8497422e09335d0693165f7376839b54b7d1a3e45ec2b6e3b5c275f5cb\naf07946a8e30f24c1a9a8db2995b2b9bb4f126f1e0ca7b76a3c2ab66d67576a2"
 
-int test_sm9_z256_fp2() {
+int test_sm9_z256_fp2() {  // 测试二次扩展有限域上的运算。
 	const SM9_Z256_TWIST_POINT _P2 = {
 		{{0xF9B7213BAF82D65B, 0xEE265948D19C17AB, 0xD2AAB97FD34EC120, 0x3722755292130B08},
 		 {0x54806C11D8806141, 0xF1DD2C190F5E93C4, 0x597B6027B441A01F, 0x85AEF3D078640C98}},
@@ -232,7 +232,7 @@ err:
 	"1cbf7f3bb04e2389184eade12de2752711cbff452363d2dfaf2bfef40618cebc\n" \
 	"3a70e829b83dc311970bc8d3e3e652f88a1ecd49b4672aa18c1c613c9a97d86f"
 
-int test_sm9_z256_fp4() {
+int test_sm9_z256_fp4() { // 测试四次扩展有限域上的运算。
 	const SM9_Z256_TWIST_POINT _Ppubs = {
 		{{0x8F14D65696EA5E32, 0x414D2177386A92DD, 0x6CE843ED24A3B573, 0x29DBA116152D1F78},
 		 {0x0AB1B6791B94C408, 0x1CE0711C5E392CFB, 0xE48AFF4B41B56501, 0x9F64080B3084F733}},
@@ -334,7 +334,7 @@ err:
 	"6c78632b7dbbbdbf347a3f5fd6935a9f9b425125b7ac106e3586a7fbee3f2f20\n" \
 	"6b35df1d1153684f1363fce020088a797802e18959df4f006bc5d7f4a632e9f9"
 
-int test_sm9_z256_fp12() {
+int test_sm9_z256_fp12() {  // 试十二次扩展有限域上的运算。
 	sm9_z256_fp12_t x;
 	sm9_z256_fp12_t y;
 	sm9_z256_fp12_t r;
@@ -394,7 +394,7 @@ err:
 	"7cf689748f3714490d7a19eae0e7bfad0e0182498b7bcd8a6998dfd00f59be51\n" \
 	"4e2e98d190e9d775e0caa943196bfb066d9c30818b2d768fb5299e7135830a6f"
 
-int test_sm9_z256_point() {
+int test_sm9_z256_point() {  // 测试椭圆曲线点的基本运算，包括点加法、倍加、取反、点乘等操作。
 	SM9_Z256_POINT p;
 	SM9_Z256_POINT q;
 	SM9_Z256_POINT r;
@@ -469,7 +469,7 @@ err:
 	"614881d4d05fef3173a4990465876c5200f58c5015e13354b23ae401c20c4aef\n" \
 	"18a22e02b7d395a49f0646a79438e79cd37c32f163fe8923c13d56bab668e8a7"
 
-int test_sm9_z256_twist_point() {
+int test_sm9_z256_twist_point() {  // 测试在扩展曲线上的点运算。
 	SM9_Z256_TWIST_POINT p;
 	SM9_Z256_TWIST_POINT q;
 	SM9_Z256_TWIST_POINT r;
@@ -554,7 +554,7 @@ err:
 	"934FDDA6D3AB48C8571CE2354B79742AA498CB8CDDE6BD1FA5946345A1A652F6"
 
 
-static int test_sm9_z256_pairing_speed(void)
+static int test_sm9_z256_pairing_speed(void)  // 测试双线性对计算的速度。
 {
 	SM9_Z256_TWIST_POINT Ppubs = {
 		{{0x8F14D65696EA5E32, 0x414D2177386A92DD, 0x6CE843ED24A3B573, 0x29DBA116152D1F78},
@@ -598,7 +598,7 @@ static int test_sm9_z256_pairing_speed(void)
 
 
 
-int test_sm9_z256_pairing()
+int test_sm9_z256_pairing()  // 测试双线性对计算。
 {
 	SM9_Z256_POINT _P1 = {
 		{0xe8c4e4817c66dddd, 0xe1e4086909dc3280, 0xf5ed0704487d01d6, 0x93de051d62bf718f},
@@ -663,14 +663,14 @@ err:
 	return -1;
 }
 
-#define hex_ks		"000130E78459D78545CB54C587E02CF480CE0B66340F319F348A1D5B1F2DC5F4"
+#define hex_ks		"000130E78459D78545CB54C587E02CF480CE0B66340F319F348A1D5B1F2DC5F4"  // 测试签名主私钥
 
 #define hex_ds \
 	"A5702F05CF1315305E2D6EB64B0DEB923DB1A0BCF0CAFF90523AC8754AA69820\n" \
 	"78559A844411F9825C109F5EE3F52D720DD01785392A727BB1556952B2B013D3"
 
 
-int test_sm9_z256_sign()
+int test_sm9_z256_sign()  // 测试SM9算法的签名和验证操作。
 {
 	SM9_SIGN_CTX ctx;
 	SM9_SIGN_KEY key;
@@ -711,7 +711,7 @@ err:
 	"7AA5E47570DA7600CD760A0CF7BEAF71C447F3844753FE74FA7BA92CA7D3B55F\n" \
 	"27538A62E7F7BFB51DCE08704796D94C9D56734F119EA44732B50E31CDEB75C1"
 
-int test_sm9_z256_ciphertext()
+int test_sm9_z256_ciphertext()  // 测试SM9算法的加密数据格式化操作。
 {
 	SM9_Z256_POINT _P1 = {
 		{0xe8c4e4817c66dddd, 0xe1e4086909dc3280, 0xf5ed0704487d01d6, 0x93de051d62bf718f},
@@ -746,7 +746,7 @@ err:
 }
 
 
-int test_sm9_z256_encrypt()
+int test_sm9_z256_encrypt()  // 测试SM9算法的加密和解密操作。
 {
 	SM9_ENC_MASTER_KEY msk;
 	SM9_ENC_KEY key;
@@ -792,7 +792,7 @@ err:
 	"44B0294AA04290E1524FF3E3DA8CFD432BB64DE3A8040B5B88D1B5FC86A4EBC1\n" \
 	"8CFC48FB4FF37F1E27727464F3C34E2153861AD08E972D1625FC1A7BD18D5539"
 
-int test_sm9_z256_exchange()
+int test_sm9_z256_exchange() // 测试SM9算法的密钥交换操作。
 {
 	SM9_EXCH_MASTER_KEY msk;
 	SM9_EXCH_KEY keyA, keyB;
