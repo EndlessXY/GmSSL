@@ -782,13 +782,13 @@ int sm9_z256_fp2_rand(sm9_z256_fp2_t r)
 
 void sm9_z256_fp2_to_bytes(const sm9_z256_fp2_t a, uint8_t buf[64])
 {
-	sm9_z256_t z;
+	sm9_z256_t z;  // 定义一个 sm9_z256_t 类型的中间变量 z。
 
-	sm9_z256_modp_from_mont(z, a[1]);
-	sm9_z256_to_bytes(z, buf);
+	sm9_z256_modp_from_mont(z, a[1]); // 调用 sm9_z256_modp_from_mont 将 a[1] 从蒙哥马利域转换为标准域，并存储在 z 中。
+	sm9_z256_to_bytes(z, buf); // 调用 sm9_z256_to_bytes 将 z 转换为字节数组，并存储在 buf 的前 32 个字节中。
 
-	sm9_z256_modp_from_mont(z, a[0]);
-	sm9_z256_to_bytes(z, buf + 32);
+	sm9_z256_modp_from_mont(z, a[0]); // 调用 sm9_z256_modp_from_mont 将 a[0] 从蒙哥马利域转换为标准域，并存储在 z 中。
+	sm9_z256_to_bytes(z, buf + 32); // 调用 sm9_z256_to_bytes 将 z 转换为字节数组，并存储在 buf 的后 32 个字节中。
 }
 
 int sm9_z256_fp2_from_bytes(sm9_z256_fp2_t r, const uint8_t buf[64])
@@ -1762,32 +1762,32 @@ void sm9_z256_fp12_frobenius6(sm9_z256_fp12_t r, const sm9_z256_fp12_t x)
 
 int sm9_z256_point_from_hex(SM9_Z256_POINT *R, const char hex[64 * 2 + 1])
 {
-	if (sm9_z256_from_hex(R->X, hex) != 1) {
+	if (sm9_z256_from_hex(R->X, hex) != 1) { // 将 hex 字符串的前 64 个字符转换为 X 坐标，并将结果存储在 R->X 中。
 		error_print();
 		return -1;
 	}
-	if (sm9_z256_cmp(R->X, SM9_Z256_P) >= 0) {
+	if (sm9_z256_cmp(R->X, SM9_Z256_P) >= 0) { // 比较 X 坐标与有限域的素数 SM9_Z256_P，如果 X 坐标大于或等于素数，则返回 -1
 		error_print();
 		return -1;
 	}
-	sm9_z256_modp_to_mont(R->X, R->X);
+	sm9_z256_modp_to_mont(R->X, R->X); // 将 X 坐标转换为蒙哥马利形式，以便于后续计算。
 
-	if (hex[64] != SM9_Z256_HEX_SEP) {
+	if (hex[64] != SM9_Z256_HEX_SEP) { // 检查十六进制字符串的第 65 个字符是否为预期的分隔符 SM9_Z256_HEX_SEP。
 		error_print();
 		return -1;
 	}
 
-	if (sm9_z256_from_hex(R->Y, hex + 65) != 1) {
+	if (sm9_z256_from_hex(R->Y, hex + 65) != 1) { // 调用 sm9_z256_from_hex 函数将 hex 字符串的后 64 个字符转换为 Y 坐标，并将结果存储在 R->Y 中。
 		error_print();
 		return -1;
 	}
-	if (sm9_z256_cmp(R->Y, SM9_Z256_P) >= 0) {
+	if (sm9_z256_cmp(R->Y, SM9_Z256_P) >= 0) { // 比较 Y 坐标与有限域的素数 SM9_Z256_P，如果 Y 坐标大于或等于素数，则返回 -1。
 		error_print();
 		return -1;
 	}
-	sm9_z256_modp_to_mont(R->Y, R->Y);
+	sm9_z256_modp_to_mont(R->Y, R->Y); // 将 Y 坐标转换为蒙哥马利形式。
 
-	sm9_z256_copy(R->Z, SM9_Z256_MODP_MONT_ONE);
+	sm9_z256_copy(R->Z, SM9_Z256_MODP_MONT_ONE); // 将 Z 坐标设置为蒙哥马利单位元素 SM9_Z256_MODP_MONT_ONE，表示这个点在椭圆曲线上的单位元素。 齐次坐标的 Z 坐标通常设置为 1。
 
 	return 1;
 }
@@ -2148,9 +2148,9 @@ int sm9_z256_point_print(FILE *fp, int fmt, int ind, const char *label, const SM
 
 int sm9_z256_twist_point_print(FILE *fp, int fmt, int ind, const char *label, const SM9_Z256_TWIST_POINT *P)
 {
-	uint8_t buf[129];
-	sm9_z256_twist_point_to_uncompressed_octets(P, buf);
-	format_bytes(fp, fmt, ind, label, buf, sizeof(buf));
+	uint8_t buf[129]; // 存储未压缩格式的点数据
+	sm9_z256_twist_point_to_uncompressed_octets(P, buf); // 将点 P 转换为未压缩的字节串形式存储到 buf
+	format_bytes(fp, fmt, ind, label, buf, sizeof(buf)); // 将 buf 的内容以指定格式打印到文件 fp
 	return 1;
 }
 
@@ -3170,12 +3170,12 @@ int sm9_z256_point_from_uncompressed_octets(SM9_Z256_POINT *P, const uint8_t oct
 
 int sm9_z256_twist_point_to_uncompressed_octets(const SM9_Z256_TWIST_POINT *P, uint8_t octets[129])
 {
-	octets[0] = 0x04;
+	octets[0] = 0x04;  // 设置未压缩格式的标志字节
 	sm9_z256_fp2_t x;
 	sm9_z256_fp2_t y;
-	sm9_z256_twist_point_get_xy(P, x, y);
-	sm9_z256_fp2_to_bytes(x, octets + 1);
-	sm9_z256_fp2_to_bytes(y, octets + 32 * 2 + 1);
+	sm9_z256_twist_point_get_xy(P, x, y); // 获取点 P 的 x 和 y 坐标
+	sm9_z256_fp2_to_bytes(x, octets + 1); // 将 x 坐标转换为字节数组并存储到 octets[1] 开始的位置
+	sm9_z256_fp2_to_bytes(y, octets + 32 * 2 + 1); // 将 y 坐标转换为字节数组并存储到 octets[65] 开始的位置
 	return 1;
 }
 

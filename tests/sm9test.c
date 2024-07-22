@@ -672,28 +672,28 @@ err:
 
 int test_sm9_z256_sign()  // 测试SM9算法的签名和验证操作。
 {
-	SM9_SIGN_CTX ctx;
-	SM9_SIGN_KEY key;
-	SM9_SIGN_MASTER_KEY mpk;
-	SM9_Z256_POINT ds;
-	uint8_t sig[1000] = {0};
-	size_t siglen = 0;
-	int j = 1;
+	SM9_SIGN_CTX ctx; // SM9签名上下文，用于签名和验证的过程管理。
+	SM9_SIGN_KEY key; // SM9签名密钥。
+	SM9_SIGN_MASTER_KEY mpk; // SM9签名主公钥。
+	SM9_Z256_POINT ds; // 用于验证签名密钥的点。
+	uint8_t sig[1000] = {0}; // 存储签名结果的缓冲区。
+	size_t siglen = 0; // 存储签名长度。
+	int j = 1; // 用于记录测试过程中出错的位置。
 
 	uint8_t data[20] = {0x43, 0x68, 0x69, 0x6E, 0x65, 0x73, 0x65, 0x20, 0x49, 0x42, 0x53, 0x20, 0x73, 0x74, 0x61, 0x6E, 0x64, 0x61, 0x72, 0x64};
 	uint8_t IDA[5] = {0x41, 0x6C, 0x69, 0x63, 0x65};
 
-	sm9_z256_from_hex(mpk.ks, hex_ks); sm9_z256_twist_point_mul_generator(&(mpk.Ppubs), mpk.ks);
-	if (sm9_sign_master_key_extract_key(&mpk, (char *)IDA, sizeof(IDA), &key) < 0) goto err; ++j;
-	sm9_z256_point_from_hex(&ds, hex_ds); if (!sm9_z256_point_equ(&(key.ds), &ds)) goto err; ++j;
+	sm9_z256_from_hex(mpk.ks, hex_ks); sm9_z256_twist_point_mul_generator(&(mpk.Ppubs), mpk.ks); // 将主私钥（十六进制字符串）转换为大数格式，并存储在mpk.ks中; 通过主私钥生成主公钥Ppubs，存储在mpk.Ppubs中
+	if (sm9_sign_master_key_extract_key(&mpk, (char *)IDA, sizeof(IDA), &key) < 0) goto err; ++j; // 从主密钥中提取用户IDA的签名密钥key
+	sm9_z256_point_from_hex(&ds, hex_ds); if (!sm9_z256_point_equ(&(key.ds), &ds)) goto err; ++j; // 验证提取的签名密钥key.ds与预期值ds是否相同
 
-	sm9_sign_init(&ctx);
-	sm9_sign_update(&ctx, data, sizeof(data));
-	if (sm9_sign_finish(&ctx, &key, sig, &siglen) < 0) goto err; ++j;
+	sm9_sign_init(&ctx); // 初始化签名上下文ctx
+	sm9_sign_update(&ctx, data, sizeof(data)); // 更新签名上下文，将待签名的数据data输入
+	if (sm9_sign_finish(&ctx, &key, sig, &siglen) < 0) goto err; ++j; // 完成签名操作，生成签名结果sig及其长度siglen
 
-	sm9_verify_init(&ctx);
-	sm9_verify_update(&ctx, data, sizeof(data));
-	if (sm9_verify_finish(&ctx, sig, siglen, &mpk, (char *)IDA, sizeof(IDA)) != 1) goto err; ++j;
+	sm9_verify_init(&ctx); // 初始化验证上下文ctx
+	sm9_verify_update(&ctx, data, sizeof(data)); // 更新验证上下文，将待验证的数据data输入
+	if (sm9_verify_finish(&ctx, sig, siglen, &mpk, (char *)IDA, sizeof(IDA)) != 1) goto err; ++j; // 完成验证操作，验证签名结果sig是否有效
 
 	printf("%s() ok\n", __FUNCTION__);
 	return 1;

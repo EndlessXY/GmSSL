@@ -78,14 +78,14 @@ int sm9_signature_from_der(SM9_SIGNATURE *sig, const uint8_t **in, size_t *inlen
 int sm9_sign_init(SM9_SIGN_CTX *ctx)
 {
 	const uint8_t prefix[1] = { SM9_HASH2_PREFIX };
-	sm3_init(&ctx->sm3_ctx);
-	sm3_update(&ctx->sm3_ctx, prefix, sizeof(prefix));
+	sm3_init(&ctx->sm3_ctx); // 调用 sm3_init 函数来初始化 SM3 哈希上下文 ctx->sm3_ctx。SM3 是国密标准的哈希函数，类似于 SHA-256。
+	sm3_update(&ctx->sm3_ctx, prefix, sizeof(prefix)); // 调用 sm3_update 函数，将前面定义的前缀 prefix 更新到哈希上下文 ctx->sm3_ctx 中。sm3_update 函数将输入数据添加到当前的哈希计算中。这一步确保了签名哈希计算以特定前缀开头，提供了额外的安全性。
 	return 1;
 }
 
 int sm9_sign_update(SM9_SIGN_CTX *ctx, const uint8_t *data, size_t datalen)
 {
-	sm3_update(&ctx->sm3_ctx, data, datalen);
+	sm3_update(&ctx->sm3_ctx, data, datalen); // 调用 sm3_update 函数，将输入的数据 data 更新到哈希上下文 ctx->sm3_ctx 中。data 是指向要签名的数据的指针，datalen 是数据的长度。
 	return 1;
 }
 
