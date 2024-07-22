@@ -795,30 +795,30 @@ err:
 
 int test_sm9_z256_exchange() // 测试SM9算法的密钥交换操作。
 {
-	SM9_EXCH_MASTER_KEY msk;
-	SM9_EXCH_KEY keyA, keyB;
+	SM9_EXCH_MASTER_KEY msk;  // 密钥交换(加密)主密钥
+	SM9_EXCH_KEY keyA, keyB; // 双方密钥交换的密钥
 	SM9_Z256_TWIST_POINT de;
 	SM9_Z256_POINT RA, RB;
 	sm9_z256_t rA;
 	size_t i, j = 1;
 
-	uint8_t idA[5] = {0x41, 0x6C, 0x69, 0x63, 0x65};
-	uint8_t idB[3] = {0x42, 0x6F, 0x62};
-	size_t klen = 0x10;
+	uint8_t idA[5] = {0x41, 0x6C, 0x69, 0x63, 0x65};  // Alice
+	uint8_t idB[3] = {0x42, 0x6F, 0x62};  // Bob
+	size_t klen = 0x10; // 要生成的共享密钥长度
 	uint8_t skA[200];
 	uint8_t skB[200];
-	sm9_z256_from_hex(msk.ke, hex_kex);
-	sm9_z256_point_mul_generator(&(msk.Ppube), msk.ke);
-	if (sm9_exch_master_key_extract_key(&msk, (char *)idA, sizeof(idA), &keyA) < 0) goto err; ++j;
-	if (sm9_exch_master_key_extract_key(&msk, (char *)idB, sizeof(idB), &keyB) < 0) goto err; ++j;
-	sm9_z256_twist_point_from_hex(&de, hex_deA); if (!sm9_z256_twist_point_equ(&(keyA.de), &de)) goto err; ++j;
-	sm9_z256_twist_point_from_hex(&de, hex_deB); if (!sm9_z256_twist_point_equ(&(keyB.de), &de)) goto err; ++j;
+	sm9_z256_from_hex(msk.ke, hex_kex); // 将 hex_kex 中的十六进制字符串转换为 SM9 的交换主密钥 ke 私钥
+	sm9_z256_point_mul_generator(&(msk.Ppube), msk.ke); // 通过主私钥生成主公钥
+	if (sm9_exch_master_key_extract_key(&msk, (char *)idA, sizeof(idA), &keyA) < 0) goto err; ++j; // 从主密钥中提取用户 idA 的密钥 keyA
+	if (sm9_exch_master_key_extract_key(&msk, (char *)idB, sizeof(idB), &keyB) < 0) goto err; ++j;  // 从主密钥中提取用户 idB 的密钥 keyB
+	sm9_z256_twist_point_from_hex(&de, hex_deA); if (!sm9_z256_twist_point_equ(&(keyA.de), &de)) goto err; ++j;  // 将预期的用户密钥 keyA.de 从十六进制字符串转换为数值，并与提取的用户密钥 keyA.de 进行比较
+	sm9_z256_twist_point_from_hex(&de, hex_deB); if (!sm9_z256_twist_point_equ(&(keyB.de), &de)) goto err; ++j;  // 将预期的用户密钥 keyB.de 从十六进制字符串转换为数值，并与提取的用户密钥 keyB.de 进行比较
 
-	if (sm9_exch_step_1A(&msk, (char *)idB, sizeof(idB), &RA, rA) < 0) goto err; ++j;
-	if (sm9_exch_step_1B(&msk, (char *)idA, sizeof(idA), (char *)idB, sizeof(idB), &keyB, &RA, &RB, skB, klen) < 0) goto err; ++j;
-	if (sm9_exch_step_2A(&msk, (char *)idA, sizeof(idA), (char *)idB, sizeof(idB), &keyA, rA, &RA, &RB, skA, klen) < 0) goto err; ++j;
+	if (sm9_exch_step_1A(&msk, (char *)idB, sizeof(idB), &RA, rA) < 0) goto err; ++j; // Alice 生成 RA 和 rA
+	if (sm9_exch_step_1B(&msk, (char *)idA, sizeof(idA), (char *)idB, sizeof(idB), &keyB, &RA, &RB, skB, klen) < 0) goto err; ++j; // Bob 生成 RB 和共享密钥 skB
+	if (sm9_exch_step_2A(&msk, (char *)idA, sizeof(idA), (char *)idB, sizeof(idB), &keyA, rA, &RA, &RB, skA, klen) < 0) goto err; ++j; // Alice 生成共享密钥 skA
 
-	for (i = 0; i < klen; i++) {
+	for (i = 0; i < klen; i++) { // 检查 Alice 和 Bob 生成的共享密钥是否相同
 		if (skA[i] != skB[i]) {
 			printf("Exchange key different at byte %zu\n", i);
 			goto err;
