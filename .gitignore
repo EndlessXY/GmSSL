@@ -49,3 +49,6 @@
 /out/*
 
 *.plist
+
+.idea
+cmake-build-debug
